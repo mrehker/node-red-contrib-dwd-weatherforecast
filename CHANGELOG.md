@@ -17,6 +17,13 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - Record assembly now works from a single resolved field list (standard fields plus additional fields, de-duplicated); the existing standard field semantics (unit conversions, derived `relHumidity`, `precipitationText`) are unchanged.
 - Core-only mode keeps additionally configured fields instead of dropping them.
+- `msg.fields_not_found` covers additional fields only. The standard fields are a fixed part of the record schema and stay in every record even when a station delivers no values for them (then as `null`); documentation and help text aligned accordingly.
+- Editor: the additional-fields multi-select now carries a localized accessible label.
+
+### Fixed
+- Fallback source precedence: record assembly now skips `null` values from a primary source so the fallback source is used (e.g. `neff` values are emitted when `Neff` is `null`); `msg.used_fields` and the records are now consistent.
+- Editor: changing the multi-select while a search filter is active no longer drops hidden or manually entered (unknown) codes — the CSV keeps the full selection.
+- Temperature error magnitudes (`E_TTT`, `E_Td`) keep their magnitude when converted to °C according to the output options (a 2 K error becomes 2 °C, not −271.15 °C).
 
 ## [1.4.1] – 2025-11-26
 

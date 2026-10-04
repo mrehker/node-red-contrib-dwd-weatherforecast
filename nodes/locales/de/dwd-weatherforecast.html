@@ -56,10 +56,13 @@
             <span class="property-type">Object</span>
         </dt>
         <dd>
-            Angeforderte Felder, zu denen es im aktuellen Zeitfenster keine Daten gab –
-            gleiche Struktur wie <code>msg.used_fields</code>. Diese Felder fehlen
-            komplett in den Datensätzen; Felder mit Werten nur an einzelnen Zeitpunkten
-            bleiben in den Datensätzen, dort mit <code>null</code>-Lücken.
+            Angeforderte Zusatzfelder, zu denen es im aktuellen Zeitfenster
+            keine Daten gab – gleiche Struktur wie <code>msg.used_fields</code>.
+            Diese Felder fehlen komplett in den Datensätzen; Felder mit Werten
+            nur an einzelnen Zeitpunkten bleiben in den Datensätzen, dort mit
+            <code>null</code>-Lücken. Die Standardfelder sind festes
+            Record-Schema: Sie bleiben auch ohne Werte in jedem Datensatz
+            (dann mit <code>null</code>) und erscheinen nicht hier.
         </dd>
 
         <dt>msg._meta

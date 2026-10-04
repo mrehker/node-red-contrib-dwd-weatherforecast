@@ -58,10 +58,13 @@
             <span class="property-type">Object</span>
         </dt>
         <dd>
-            Requested fields with no data in the current time window,
-            same structure as <code>msg.used_fields</code>. Such fields are
-            omitted from the records entirely; fields with values only at some
-            timestamps remain in the records with <code>null</code> gaps.
+            Requested additional fields with no data in the current time
+            window, same structure as <code>msg.used_fields</code>. Such fields
+            are omitted from the records entirely; fields with values only at
+            some timestamps remain in the records with <code>null</code> gaps.
+            The standard fields are a fixed part of the record schema: they
+            stay in every record even without values (then <code>null</code>)
+            and do not appear here.
         </dd>
 
         <dt>msg._meta

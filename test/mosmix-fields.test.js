@@ -222,3 +222,27 @@ test("mosmix_elements.json: Conversion-Zuordnung vollständig und konsistent", (
     assert.equal(mosmix.CONVERSION_UNITS.pressureToHpa, "hPa");
     assert.equal(mosmix.CONVERSION_UNITS.visibilityToKm, "km");
 });
+
+// ---------------------------------------------------------------------------
+// Regression: Temperatur-FEHLERgroessen (E_TTT, E_Td) duerfen nicht den
+// Kelvin-Offset erhalten — die Betragsdifferenz ist in K und °C identisch.
+// (Copilot-Review, Fix vom PR-Autor uebernommen.)
+// ---------------------------------------------------------------------------
+
+test("convertValue: E_TTT/E_Td behalten die Fehlergroesse (kein Kelvin-Offset)", () => {
+    assert.equal(mosmix.convertValue("E_TTT", 2, { toC: true }), 2);
+    assert.equal(mosmix.convertValue("E_Td", 1.55, { toC: true }), 1.55);
+    // absolut gesehen falsch waere: 2 - 273.15 = -271.15
+    assert.notEqual(mosmix.convertValue("E_TTT", 2, { toC: true }), -271.15);
+});
+
+test("convertValue: E_TTT/E_Td ohne Toggle unveraendert", () => {
+    assert.equal(mosmix.convertValue("E_TTT", 2, { toC: false }), 2);
+    assert.equal(mosmix.convertValue("E_TTT", 2), 2);
+});
+
+test("fieldsDict: E_TTT mit Toggle liefert effektive Unit und Originalunit", () => {
+    const d = mosmix.fieldsDict(["E_TTT"], { toC: true });
+    assert.equal(d.errorTemperature.unit, "°C");
+    assert.equal(d.errorTemperature.unit_original, "Kelvin");
+});

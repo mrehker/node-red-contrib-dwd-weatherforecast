@@ -588,7 +588,9 @@ module.exports = function (RED) {
         const getFirst = (codes, i) => {
             for (const code of codes) {
                 const p = params[code];
-                if (p && p.values[i] !== undefined) return p.values[i];
+                // null ueberspringen: Fallback-Quelle (z. B. neff fuer Neff)
+                // soll greifen, wenn die Primaerquelle nur null liefert.
+                if (p && p.values[i] != null) return p.values[i];
             }
             return null;
         };
@@ -1106,11 +1108,14 @@ module.exports = function (RED) {
                 //         : node.additionalFields;
                 const requestedAdditional = node.additionalFields;
                 const resolved = mosmix.resolveFields(requestedAdditional);
-                // used_fields listet nur tatsächlich gelieferte Felder;
-                // Felder ohne einen einzigen Wert im Zeitfenster kommen
-                // gar nicht erst in die Records und landen in
-                // fields_not_found (analoge Struktur). Felder mit
+                // used_fields listet nur tatsächlich gelieferte Felder.
+                // Zusatzfelder ohne einen einzigen Wert im Zeitfenster
+                // kommen gar nicht erst in die Records und landen in
+                // fields_not_found (analoge Struktur); Felder mit
                 // Teil-Lücken bleiben wie gehabt mit null je Record.
+                // Standardfelder sind festes Record-Schema (Legacy) und
+                // bleiben auch ohne Werte als null in den Records,
+                // tauchen aber nicht in fields_not_found auf.
                 const availableCodes = resolved.fields.filter((code) =>
                     mosmix.fieldAvailable(code, pa2)
                 );
@@ -1127,7 +1132,9 @@ module.exports = function (RED) {
                     windDirMode: node.windDirMode,
                     toggles: cfg
                 });
-                const fieldsNotFound = mosmix.fieldsDict(missingCodes);
+                const fieldsNotFound = mosmix.fieldsDict(
+                    missingCodes.filter((code) => resolved.additional.includes(code))
+                );
 
                 const series = normalizeRecords(ts2, pa2, cfg);
 

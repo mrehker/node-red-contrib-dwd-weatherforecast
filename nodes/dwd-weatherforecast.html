@@ -193,6 +193,8 @@
                placeholder="Filter by code, field name or description…"
                style="width: calc(100% - 190px); margin-bottom: 4px;">
         <select id="node-input-additionalFieldsSelect" multiple size="8"
+                data-i18n="[aria-label]ui.additionalFieldsAriaLabel"
+                aria-label="Additional MOSMIX fields (multi-select)"
                 style="width: calc(100% - 190px); min-height: 160px;"></select>
     </div>
 
@@ -263,6 +265,11 @@
                 // muss zu STANDARD_FIELDS in nodes/lib/mosmix-fields.js passen
                 var STANDARD_CODES = ["TTT", "Td", "FF", "DD", "PPPP", "VV", "Neff", "RR1c"];
                 var elements = [];
+                // Vollstaendige Auswahl (inkl. gefiltert ausgeblendeter und
+                // manuell eingegebener Codes) — die gerenderten Optionen
+                // zeigen nur einen Ausschnitt.
+                var fullSelection = selectedCodes();
+                var shownCodes = [];
 
                 function selectedCodes() {
                     return ($store.val() || "").split(",").map(function (s) { return s.trim(); }).filter(Boolean);
@@ -270,8 +277,9 @@
 
                 function renderOptions() {
                     var q = ($filter.val() || "").toLowerCase();
-                    var selected = selectedCodes();
+                    var selected = fullSelection;
                     $select.empty();
+                    shownCodes = [];
                     var shown = 0;
                     for (var i = 0; i < elements.length && shown < 200; i++) {
                         var e = elements[i];
@@ -284,13 +292,13 @@
                         var $opt = $("<option>").val(e.code).text(label);
                         if (selected.indexOf(e.code) !== -1) $opt.prop("selected", true);
                         $select.append($opt);
+                        shownCodes.push(e.code);
                         shown++;
                     }
                 }
 
                 function syncSelectFromInput() {
-                    var selected = selectedCodes();
-                    $select.val(selected);
+                    fullSelection = selectedCodes();
                     renderOptions();
                 }
 
@@ -303,8 +311,18 @@
 
                 $filter.on("input", renderOptions);
                 $select.on("change", function () {
-                    // Auswahl -> Eingabefeld
-                    $store.val(($select.val() || []).join(","));
+                    // Auswahl -> Eingabefeld. Gefiltert ausgeblendete und
+                    // unbekannte (nicht gerenderte) Codes bleiben erhalten;
+                    // nur die sichtbaren Optionen werden ersetzt.
+                    var picked = $select.val() || [];
+                    var kept = fullSelection.filter(function (c) {
+                        return shownCodes.indexOf(c) === -1;
+                    });
+                    var merged = kept.concat(picked.filter(function (c) {
+                        return kept.indexOf(c) === -1;
+                    }));
+                    fullSelection = merged;
+                    $store.val(merged.join(","));
                 });
                 $store.on("input", syncSelectFromInput);
             }

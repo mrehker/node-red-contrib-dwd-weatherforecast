@@ -118,9 +118,9 @@ When enabled, additional log messages are written into the Node-RED log to help 
 ### Additional fields
 Pick any number of extra MOSMIX elements (e.g. sunshine duration `SunD`, gusts `FX1`, thunderstorm probability `wwT`) from the searchable catalogue.
 
-- Values are included in every record. Fields with an assigned conversion in the metadata catalogue are converted according to the output options (temperature in °C, wind in km/h, pressure in hPa, visibility in km); all other values stay unchanged (raw MOSMIX units, e.g. Kelvin/m/s/Pa as delivered by DWD).
+- Values are included in every record. Fields with an assigned conversion in the metadata catalogue are converted according to the output options (temperature in °C, wind in km/h, pressure in hPa, visibility in km); all other values stay unchanged (raw MOSMIX units, e.g. Kelvin/m/s/Pa as delivered by DWD). Temperature **error** magnitudes (`E_TTT`, `E_Td`) keep their magnitude — a 2 K error becomes 2 °C, not −271.15 °C.
 - Field codes are translated to speaking record field names (e.g. `SunD` → `sunshineDurationYesterday`); codes unknown to the catalogue use the code itself as field name.
-- Fields with no data at all in the time window are omitted from the records and listed in `msg.fields_not_found`; partially available fields stay in the records with `null` gaps.
+- Fields with no data at all in the time window are omitted from the records and listed in `msg.fields_not_found`; partially available fields stay in the records with `null` gaps. `msg.fields_not_found` covers additional fields only — the standard fields are a fixed part of the record schema and stay in every record even when a station delivers no values for them (then as `null`).
 - Additional fields are kept even in **core-only mode**.
 
 ---
@@ -188,7 +188,7 @@ The message also carries a `used_fields` dictionary describing every delivered f
 }
 ```
 
-`_meta.additionalFields` lists the requested extra codes, `_meta.additionalFieldsNotAvailable` those the station did not deliver. Requested fields with no data at all in the current time window are **omitted from the records entirely** and only reported in `msg.fields_not_found`; fields with values at some but not all timestamps appear in every record, `null` where no value exists.
+`_meta.additionalFields` lists the requested extra codes, `_meta.additionalFieldsNotAvailable` those the station did not deliver. Requested fields with no data at all in the current time window are **omitted from the records entirely** and only reported in `msg.fields_not_found` (additional fields only; the standard fields are a fixed part of the record schema and remain in every record, as `null` when the station delivers no values); fields with values at some but not all timestamps appear in every record, `null` where no value exists.
 
 Each record carries a `type` field classifying its timestamp: `past` (before now), `current` (first step at or after now) or `forecast`.
 
