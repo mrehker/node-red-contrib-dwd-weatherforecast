@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 - Editor: the additional-fields multi-select now carries a localized accessible label.
 
 ### Fixed
+- `msg.station.name` was not resolved for pure numeric WMO station IDs (e.g. `10962`): the ID check only recognised letter-led IDs like `K1174`, so the ID from `<name>` was mistaken for the station name and the `<description>` fallback was never reached. Both ID shapes are now recognised and the description fallback works for them (e.g. `10962` → `HOHENPEISS.BG`).
 - Fallback source precedence: record assembly now skips `null` values from a primary source so the fallback source is used (e.g. `neff` values are emitted when `Neff` is `null`); `msg.used_fields` and the records are now consistent.
 - Editor: changing the multi-select while a search filter is active no longer drops hidden or manually entered (unknown) codes — the CSV keeps the full selection.
 - Temperature error magnitudes (`E_TTT`, `E_Td`) keep their magnitude when converted to °C according to the output options (a 2 K error becomes 2 °C, not −271.15 °C).
