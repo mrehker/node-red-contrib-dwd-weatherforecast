@@ -165,8 +165,11 @@ module.exports = function (RED) {
 
         if (desc) {
             const plain = desc.replace(/<[^>]*>/g, "").trim();
-            const m = plain.match(/^(.+?)\s*\([A-Z0-9]{3,5}\)\s*$/i);
-            if (m && m[1] && !looksLikeId(m[1])) return m[1].trim();
+            // Klammerzusatz nur streifen, wenn er wirklich eine Stations-ID
+            // ist (z. B. "Heinsberg (K1174)"); echte Ortszusätze wie
+            // "Halle (Saale)" bleiben erhalten.
+            const m = plain.match(/^(.+?)\s*\(([^()]*)\)\s*$/);
+            if (m && m[1] && looksLikeId(m[2])) return m[1].trim();
             const first = plain.split(/[\r\n]/)[0].trim();
             if (first && !looksLikeId(first)) return first;
         }

@@ -53,3 +53,13 @@ test("StationName: xml2js-Objektform ({_}) wird verarbeitet", () => {
     const doc = { Placemark: [{ name: [{ _: "10962" }], description: [{ _: "HOHENPEISS.BG" }] }] };
     assert.equal(tryGetStationName(doc), "HOHENPEISS.BG");
 });
+
+test("StationName: Ortszusatz in Klammern bleibt erhalten (Halle (Saale))", () => {
+    const doc = { Placemark: [{ name: ["H721"], description: ["Halle (Saale)"] }] };
+    assert.equal(tryGetStationName(doc), "Halle (Saale)");
+});
+
+test("StationName: numerische ID in Klammern wird gestrippt", () => {
+    const doc = { Placemark: [{ name: ["10962"], description: ["Hohenpeißenberg (10962)"] }] };
+    assert.equal(tryGetStationName(doc), "Hohenpeißenberg");
+});
