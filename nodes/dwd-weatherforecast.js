@@ -96,7 +96,7 @@ module.exports = function (RED) {
     // Station-Name (Placemark > name / kml:name / description fallback)
     function tryGetStationName(document) {
         const asArr = (x) => (x == null ? [] : Array.isArray(x) ? x : [x]);
-        const looksLikeId = (s) => /^[A-Z]\d{3,4}$/i.test(String(s).trim());
+        const looksLikeId = (s) => /^([A-Z]\d{3,4}|\d{5})$/i.test(String(s).trim());
 
         const placemarks = []
             .concat(asArr(document && document.Placemark))
@@ -154,7 +154,7 @@ module.exports = function (RED) {
 
         if (desc) {
             const plain = desc.replace(/<[^>]*>/g, "").trim();
-            const m = plain.match(/^(.+?)\s*\([A-Z0-9]{3,4}\)\s*$/i);
+            const m = plain.match(/^(.+?)\s*\([A-Z0-9]{3,5}\)\s*$/i);
             if (m && m[1] && !looksLikeId(m[1])) return m[1].trim();
             const first = plain.split(/[\r\n]/)[0].trim();
             if (first && !looksLikeId(first)) return first;
@@ -1138,4 +1138,7 @@ module.exports = function (RED) {
     }
 
     RED.nodes.registerType("dwd-weatherforecast", DwdWeatherForecastNode);
+
+    // Test-Hook: Interna fuer Unit-Tests freigeben (kein Node-RED noetig)
+    module.exports._test = { tryGetStationName };
 };
