@@ -187,7 +187,7 @@ function convertValue(code, value, toggles) {
     if (!Number.isFinite(n)) return value;
     switch (meta.conversion) {
         case "toC":
-            return +(n - 273.15).toFixed(2);
+            return +((code === "E_TTT" || code === "E_Td") ? n : n - 273.15).toFixed(2);
         case "windToKmh":
             return +(n * 3.6).toFixed(2);
         case "pressureToHpa":
